@@ -1,1 +1,0 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"firewalls","Source":"./firewall","Dir":"firewall"},{"Key":"kubernetes_cluster","Source":"./GKE","Dir":"GKE"},{"Key":"management_subnet","Source":"./subnet","Dir":"subnet"},{"Key":"vpc","Source":"./vpc","Dir":"vpc"}]}
