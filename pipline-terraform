@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(choices: ['apply', 'destroy'], name: 'action', description: 'Select the Terraform action to perform')
+    }
+
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('2f0167f1-0201-4c4b-b9fb-068059ef41e7').toString()
+    }
+
+    stages {
+        stage('Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/shereenm1521/Final-ITI.git'
+            }
+        }
+
+        stage('init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('action') {
+            steps {
+                script {
+                    if (params.action == 'apply') {
+                        sh 'terraform apply -auto-approve'
+                    } else if (params.action == 'destroy') {
+                        sh 'terraform destroy -auto-approve'
+                    } else {
+                        error "Invalid action specified. Use 'apply' or 'destroy'."
+                    }
+                }
+            }
+        }
+    }
+}

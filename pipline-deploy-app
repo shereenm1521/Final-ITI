@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Authenticate with GKE Cluster') {
+            steps {
+                sh 'gcloud container clusters get-credentials my-gke-cluster --region=us-east1-b --project=sherein'
+            }
+        }
+
+        stage('Wait for Infrastructure Pipeline') {
+            steps {
+                build job: 'Terraform-Gcp-part1', wait: true
+            }
+        }
+
+        stage('Clone App Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/shereenm1521/repo-python.git'
+            }
+        }
+
+        stage('Deploy App') {
+            steps {
+                sh 'kubectl apply -f deploy.yaml'
+                sh 'kubectl apply -f service.yaml'
+            }
+        }
+    }
+}
