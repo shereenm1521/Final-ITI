@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('2f0167f1-0201-4c4b-b9fb-068059ef41e7').toString()
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('secret-key')
     }
 
     stages {
@@ -34,6 +34,12 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            build job: 'Final-deploy-python', propagate: false
         }
     }
 }
