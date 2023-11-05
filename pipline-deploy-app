@@ -1,45 +1,31 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(choices: ['apply', 'destroy'], name: 'action', description: 'Select the Terraform action to perform')
-    }
-
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('secret-key')
     }
 
     stages {
-        stage('Git') {
+        stage('Authenticate with GKE Cluster') {
             steps {
-                git branch: 'main', url: 'https://github.com/shereenm1521/Final-ITI.git'
+                sh 'gcloud container clusters get-credentials my-gke-cluster --region=us-east1-b --project=sherein'
             }
         }
 
-        stage('init') {
+        
+        stage('Clone App Repository') {
             steps {
-                sh 'terraform init'
+                git branch: 'main', url: 'https://github.com/shereenm1521/repo-python.git'
             }
         }
 
-        stage('action') {
+        stage('Deploy App') {
             steps {
-                script {
-                    if (params.action == 'apply') {
-                        sh 'terraform apply -auto-approve'
-                    } else if (params.action == 'destroy') {
-                        sh 'terraform destroy -auto-approve'
-                    } else {
-                        error "Invalid action specified. Use 'apply' or 'destroy'."
-                    }
-                }
+                sh'gcloud container clusters get-credentials my-gke-cluster --region=us-east1-b --project=sherein'
+                sh 'kubectl apply -f deploy.yaml'
+                sh 'kubectl apply -f service.yaml'
+                sh 'kubectl get all'
             }
-        }
-    }
-
-    post {
-        success {
-            build job: 'Final-deploy-python', propagate: false
         }
     }
 }
